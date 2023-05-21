@@ -31,12 +31,12 @@ elif [[ -e /etc/debian_version ]]; then
 elif [[ -e /etc/almalinux-release || -e /etc/rocky-release || -e /etc/centos-release ]]; then
 	os="centos"
 	os_version=$(grep -shoE '[0-9]+' /etc/almalinux-release /etc/rocky-release /etc/centos-release | head -1)
-elif [[ -e /etc/fedora-release ]]; then
+elif [[ -e /etc/fedora-release || -e /etc/amazon-linux-release ]]; then
 	os="fedora"
-	os_version=$(grep -oE '[0-9]+' /etc/fedora-release | head -1)
+	os_version=$(grep -shoE '[0-9]+' /etc/fedora-release /etc/amazon-linux-release| head -1)
 else
 	echo "This installer seems to be running on an unsupported distribution.
-Supported distros are Ubuntu, Debian, AlmaLinux, Rocky Linux, CentOS and Fedora."
+Supported distros are Ubuntu, Debian, AlmaLinux, Rocky Linux, CentOS, Fedora, and Amazon Linux 2023."
 	exit
 fi
 
@@ -67,7 +67,7 @@ fi
 systemd-detect-virt -cq
 is_container="$?"
 
-if [[ "$os" == "fedora" && "$os_version" -eq 31 && $(uname -r | cut -d "." -f 2) -lt 6 && ! "$is_container" -eq 0 ]]; then
+if [[ "$os" == "fedora" && ("$os_version" -eq 31 || "$os_Version" -eq 2023 ) && $(uname -r | cut -d "." -f 2) -lt 6 && ! "$is_container" -eq 0 ]]; then
 	echo 'Fedora 31 is supported, but the kernel is outdated.
 Upgrade the kernel using "dnf upgrade kernel" and restart.'
 	exit
